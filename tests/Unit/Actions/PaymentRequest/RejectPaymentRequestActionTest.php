@@ -6,6 +6,7 @@ namespace Tests\Unit\Actions\PaymentRequest;
 
 use App\Actions\PaymentRequest\RejectPaymentRequestAction;
 use App\Enums\PaymentStatus;
+use App\Exceptions\PaymentNotPendingException;
 use App\Models\PaymentRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,5 +33,16 @@ class RejectPaymentRequestActionTest extends TestCase
             'status' => 'rejected',
             'reviewed_by' => $finance->id,
         ]);
+    }
+
+    public function test_it_throws_when_the_request_is_not_pending(): void
+    {
+        $payment = PaymentRequest::factory()->rejected()->create([
+            'user_id' => User::factory()->create()->id,
+        ]);
+
+        $this->expectException(PaymentNotPendingException::class);
+
+        (new RejectPaymentRequestAction())->handle($payment, User::factory()->create());
     }
 }

@@ -23,13 +23,11 @@ class PaymentRequestPolicy
 
     public function approve(User $user, PaymentRequest $payment): bool
     {
-        return $user->hasRole(Role::Finance->value)
-            && $payment->status->isPending();
+        return $user->hasRole(Role::Finance->value);
     }
 
     public function reject(User $user, PaymentRequest $payment): bool
     {
-        return $user->hasRole(Role::Finance->value)
-            && $payment->status->isPending();
+        return $user->hasRole(Role::Finance->value);
     }
 }

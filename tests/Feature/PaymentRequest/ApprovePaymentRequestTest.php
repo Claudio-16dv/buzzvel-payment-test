@@ -56,6 +56,7 @@ class ApprovePaymentRequestTest extends TestCase
         Sanctum::actingAs($finance);
 
         $this->patchJson("/api/payment-requests/{$payment->id}/approve")
-            ->assertForbidden();
+            ->assertStatus(409)
+            ->assertJsonPath('message', 'This payment request cannot be approved or rejected because it is not pending.');
     }
 }

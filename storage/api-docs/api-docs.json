@@ -1,0 +1,586 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Multi-Currency Payment API",
+        "description": "API for managing multi-currency payment requests with role-based approval and real-time exchange rates.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Local environment"
+        }
+    ],
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login",
+                "description": "Authenticate a user and return an access token. Start here.",
+                "operationId": "ea134134deae11eb974c719450ef8a02",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "finance@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register",
+                "description": "Register a new user and return an access token.",
+                "operationId": "58fe5a217ef88ae75e9b530a5e5817d1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation",
+                                    "country",
+                                    "currency"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Ana Costa"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ana@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "example": "Brazil"
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "BRL"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "employee",
+                                        "enum": [
+                                            "employee",
+                                            "finance"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User registered",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout",
+                "description": "Revoke the current access token.",
+                "operationId": "5ebea01ab5f21df71d38f3505718a1d7",
+                "responses": {
+                    "200": {
+                        "description": "Logged out"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Current user",
+                "description": "Get the authenticated user profile.",
+                "operationId": "a1d267b629b92178b83f0419482a139d",
+                "responses": {
+                    "200": {
+                        "description": "Current user"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/payment-requests": {
+            "get": {
+                "tags": [
+                    "Payment Requests"
+                ],
+                "summary": "List payment requests",
+                "description": "Employees see their own requests; finance sees all.",
+                "operationId": "87130f59233cf87946f3c41afaf31044",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "approved",
+                                "rejected",
+                                "expired"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of payment requests"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Invalid status filter"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Payment Requests"
+                ],
+                "summary": "Create payment request",
+                "description": "Exchange rate is fetched automatically at creation time.",
+                "operationId": "725ba2a9aeeb6301484e99c18c1d7855",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "amount",
+                                    "currency"
+                                ],
+                                "properties": {
+                                    "amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 500
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "BRL"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Office supplies"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Payment request created"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/payment-requests/{paymentRequest}": {
+            "get": {
+                "tags": [
+                    "Payment Requests"
+                ],
+                "summary": "Show payment request",
+                "description": "View a single payment request (owner or finance).",
+                "operationId": "4b1762051e6511c49f8447713d0c16ba",
+                "parameters": [
+                    {
+                        "name": "paymentRequest",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment request details"
+                    },
+                    "403": {
+                        "description": "Not allowed to view this request"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/payment-requests/{paymentRequest}/approve": {
+            "patch": {
+                "tags": [
+                    "Payment Requests"
+                ],
+                "summary": "Approve payment request",
+                "description": "Approve a pending payment request (finance only).",
+                "operationId": "5e3212974da07e86e3404062ef046734",
+                "parameters": [
+                    {
+                        "name": "paymentRequest",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment request approved"
+                    },
+                    "403": {
+                        "description": "Not finance"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "409": {
+                        "description": "Payment request is not pending"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/payment-requests/{paymentRequest}/reject": {
+            "patch": {
+                "tags": [
+                    "Payment Requests"
+                ],
+                "summary": "Reject payment request",
+                "description": "Reject a pending payment request (finance only).",
+                "operationId": "0453090736fa06b69973b07ae834cbdd",
+                "parameters": [
+                    {
+                        "name": "paymentRequest",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment request rejected"
+                    },
+                    "403": {
+                        "description": "Not finance"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "409": {
+                        "description": "Payment request is not pending"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Ana Costa"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "ana@example.com"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "Brazil"
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "BRL"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "employee"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-06-11T13:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthResponse": {
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "token": {
+                        "type": "string",
+                        "example": "1|aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789"
+                    }
+                },
+                "type": "object"
+            },
+            "PaymentRequest": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "amount": {
+                        "type": "string",
+                        "example": "500.00"
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "BRL"
+                    },
+                    "exchange_rate": {
+                        "type": "string",
+                        "example": "5.98000000"
+                    },
+                    "amount_in_eur": {
+                        "type": "string",
+                        "example": "83.61"
+                    },
+                    "rate_source": {
+                        "type": "string",
+                        "example": "exchangerate-api.com"
+                    },
+                    "rate_fetched_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-06-11T13:00:00.000000Z"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "pending",
+                        "enum": [
+                            "pending",
+                            "approved",
+                            "rejected",
+                            "expired"
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Office supplies",
+                        "nullable": true
+                    },
+                    "reviewed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "reviewer": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-06-11T13:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ValidationError": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "The given data was invalid."
+                    },
+                    "errors": {
+                        "type": "object",
+                        "example": {
+                            "email": [
+                                "The email field is required."
+                            ]
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "MessageResponse": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Logged out successfully."
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Sanctum personal access token. Paste the token returned by /api/login.",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Register, login and logout"
+        },
+        {
+            "name": "Payment Requests",
+            "description": "Create, list, view and review payment requests"
+        }
+    ]
+}
