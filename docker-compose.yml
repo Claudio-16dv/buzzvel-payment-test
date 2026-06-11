@@ -9,6 +9,9 @@ services:
     image: multicurrency-app
     restart: unless-stopped
     working_dir: /var/www
+    environment:
+      # The app container bootstraps the application (key, migrations, seeders).
+      RUN_APP_BOOTSTRAP: "true"
     volumes:
       - .:/var/www
       # Preserve the vendor/ built into the image (not present in a fresh clone).
