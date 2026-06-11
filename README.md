@@ -83,7 +83,8 @@ are needed to run locally.
 docker compose up -d --build
 ```
 
-This starts four services:
+This builds the PHP image (installing Composer dependencies automatically) and
+starts four services:
 
 | Service     | Description                                   | Host port |
 | ----------- | --------------------------------------------- | --------- |

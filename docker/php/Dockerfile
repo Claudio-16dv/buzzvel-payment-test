@@ -35,7 +35,21 @@ COPY docker/php/php.ini /usr/local/etc/php/conf.d/99-custom.ini
 
 WORKDIR /var/www
 
+# Give the app user ownership of the working dir before switching to it,
+# so Composer can create the vendor/ directory during the build.
+RUN chown -R app:app /var/www
+
+# Install PHP dependencies during the build, as the app user so that the
+# generated vendor/ is owned correctly. The vendor/ baked into the image is
+# preserved at runtime by an anonymous volume (see docker-compose.yml),
+# so a fresh clone works without any manual "composer install" step.
 USER app
+
+COPY --chown=app:app composer.json composer.lock ./
+RUN composer install --no-interaction --prefer-dist --no-scripts --no-autoloader
+
+COPY --chown=app:app . .
+RUN composer dump-autoload --optimize --no-scripts
 
 EXPOSE 9000
 

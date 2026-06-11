@@ -11,6 +11,8 @@ services:
     working_dir: /var/www
     volumes:
       - .:/var/www
+      # Preserve the vendor/ built into the image (not present in a fresh clone).
+      - /var/www/vendor
     depends_on:
       db:
         condition: service_healthy
@@ -52,11 +54,18 @@ services:
 
   # Runs the Laravel scheduler (handles expiring stale payment requests).
   scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
     image: multicurrency-app
     restart: unless-stopped
     working_dir: /var/www
     volumes:
       - .:/var/www
+      - /var/www/vendor
     depends_on:
       app:
         condition: service_started
