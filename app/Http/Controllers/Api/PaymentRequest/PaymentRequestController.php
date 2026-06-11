@@ -9,7 +9,7 @@ use App\Actions\PaymentRequest\CreatePaymentRequestAction;
 use App\Actions\PaymentRequest\ListPaymentRequestsAction;
 use App\Actions\PaymentRequest\RejectPaymentRequestAction;
 use App\Actions\PaymentRequest\ShowPaymentRequestAction;
-use App\DataTransferObjects\CreatePaymentRequestData;
+use App\DTO\CreatePaymentRequestData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PaymentRequest\IndexPaymentRequest;
 use App\Http\Requests\PaymentRequest\StorePaymentRequest;

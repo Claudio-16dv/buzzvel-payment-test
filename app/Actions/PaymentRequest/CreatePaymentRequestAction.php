@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\PaymentRequest;
 
-use App\DataTransferObjects\CreatePaymentRequestData;
+use App\DTO\CreatePaymentRequestData;
 use App\Enums\PaymentStatus;
 use App\Models\PaymentRequest;
 use App\Services\ExchangeRateService;

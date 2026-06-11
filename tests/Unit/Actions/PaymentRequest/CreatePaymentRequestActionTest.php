@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit\Actions\PaymentRequest;
 
 use App\Actions\PaymentRequest\CreatePaymentRequestAction;
-use App\DataTransferObjects\CreatePaymentRequestData;
-use App\DataTransferObjects\ExchangeRate;
+use App\DTO\CreatePaymentRequestData;
+use App\DTO\ExchangeRate;
 use App\Enums\PaymentStatus;
 use App\Models\User;
 use App\Services\ExchangeRateService;

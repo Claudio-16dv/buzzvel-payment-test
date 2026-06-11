@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\DataTransferObjects\ExchangeRate;
+use App\DTO\ExchangeRate;
 use App\Exceptions\ExchangeRateException;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Cache;

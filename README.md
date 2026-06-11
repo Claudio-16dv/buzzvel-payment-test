@@ -271,7 +271,7 @@ app/
 ├── Actions/              Business operations (one class per action, handle() method)
 │   ├── Auth/
 │   └── PaymentRequest/
-├── DataTransferObjects/  Typed input objects (e.g. payment creation)
+├── DTO/                  Typed input objects (e.g. payment creation)
 ├── Enums/                PaymentStatus, Role
 ├── Exceptions/           Domain exceptions (exchange rate, payment state)
 ├── Http/
