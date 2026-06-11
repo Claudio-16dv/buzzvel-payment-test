@@ -33,6 +33,10 @@ RUN groupadd -g ${GID} app \
 
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/99-custom.ini
 
+# Entrypoint waits for the database and bootstraps the app (key/migrate/seed).
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 WORKDIR /var/www
 
 # Give the app user ownership of the working dir before switching to it,
@@ -53,4 +57,5 @@ RUN composer dump-autoload --optimize --no-scripts
 
 EXPOSE 9000
 
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]
