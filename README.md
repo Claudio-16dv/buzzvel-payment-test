@@ -237,10 +237,11 @@ docker compose exec app php artisan test
 
 Tests are split into:
 
-- **Unit** (`tests/Unit`): actions and the exchange rate service in isolation
-  (the external API is faked, so no network calls are made).
-- **Feature** (`tests/Feature`): full HTTP flows including authentication and
-  authorization.
+- **Unit** (`tests/Unit`): the core of the suite — every action and the
+  exchange rate service tested in isolation (the external API is faked, so no
+  network calls are made).
+- **Feature** (`tests/Feature`): HTTP-level tests for the payment request
+  endpoints, focused on authentication and role-based authorization.
 
 ---
 
